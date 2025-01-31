@@ -1,7 +1,7 @@
 package de.caritas.cob.uploadservice.api.tenant;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.keycloak.representations.AccessToken;
 import org.springframework.stereotype.Component;
@@ -15,8 +15,11 @@ public class TechnicalUserTenantResolver implements TenantResolver {
   }
 
   private boolean isTechnicalUserRole(HttpServletRequest request) {
-    AccessToken token = ((KeycloakAuthenticationToken) request.getUserPrincipal()).getAccount()
-        .getKeycloakSecurityContext().getToken();
+    AccessToken token =
+        ((KeycloakAuthenticationToken) request.getUserPrincipal())
+            .getAccount()
+            .getKeycloakSecurityContext()
+            .getToken();
     return hasRoles(token) && token.getRealmAccess().getRoles().contains("technical");
   }
 

@@ -6,6 +6,7 @@ import de.caritas.cob.uploadservice.api.exception.KeycloakException;
 import de.caritas.cob.uploadservice.api.helper.AuthenticatedUser;
 import de.caritas.cob.uploadservice.media.MimeTypeDetector;
 import de.caritas.cob.uploadservice.media.TikaMimeTypeDetector;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 import org.apache.tika.Tika;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -95,8 +95,7 @@ public class UploadServiceApplication {
   @Bean
   @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
   public KeycloakSecurityContext getKeycloakSecurityContext() {
-    return ((KeycloakAuthenticationToken) getRequest()
-        .getUserPrincipal())
+    return ((KeycloakAuthenticationToken) getRequest().getUserPrincipal())
         .getAccount()
         .getKeycloakSecurityContext();
   }
@@ -123,7 +122,8 @@ public class UploadServiceApplication {
     if (claimMap.containsKey(CLAIM_NAME_USER_ID)) {
       authenticatedUser.setUserId(claimMap.get(CLAIM_NAME_USER_ID).toString());
     } else {
-      throw new KeycloakException("Keycloak user attribute '" + CLAIM_NAME_USER_ID + "' not found.");
+      throw new KeycloakException(
+          "Keycloak user attribute '" + CLAIM_NAME_USER_ID + "' not found.");
     }
 
     if (claimMap.containsKey(CLAIM_NAME_USERNAME)) {
@@ -141,16 +141,13 @@ public class UploadServiceApplication {
     if (isNotEmpty(roles)) {
       authenticatedUser.setRoles(roles);
     } else {
-      throw new KeycloakException(
-              authenticatedUser.getUserId());
+      throw new KeycloakException(authenticatedUser.getUserId());
     }
 
     // Set granted authorities
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     authenticatedUser.setGrantedAuthorities(
-        authentication.getAuthorities().stream()
-            .map(Object::toString)
-            .collect(Collectors.toSet()));
+        authentication.getAuthorities().stream().map(Object::toString).collect(Collectors.toSet()));
 
     // Set Keycloak token to authenticated user object
     if (keycloakSecContext.getTokenString() != null) {
@@ -198,7 +195,13 @@ public class UploadServiceApplication {
    */
   @Bean
   public WebMvcEndpointHandlerMapping webEndpointServletHandlerMapping(
-      WebEndpointsSupplier webEndpointsSupplier, ServletEndpointsSupplier servletEndpointsSupplier, ControllerEndpointsSupplier controllerEndpointsSupplier, EndpointMediaTypes endpointMediaTypes, CorsEndpointProperties corsProperties, WebEndpointProperties webEndpointProperties, Environment environment) {
+      WebEndpointsSupplier webEndpointsSupplier,
+      ServletEndpointsSupplier servletEndpointsSupplier,
+      ControllerEndpointsSupplier controllerEndpointsSupplier,
+      EndpointMediaTypes endpointMediaTypes,
+      CorsEndpointProperties corsProperties,
+      WebEndpointProperties webEndpointProperties,
+      Environment environment) {
     List<ExposableEndpoint<?>> allEndpoints = new ArrayList<>();
     Collection<ExposableWebEndpoint> webEndpoints = webEndpointsSupplier.getEndpoints();
     allEndpoints.addAll(webEndpoints);
@@ -206,11 +209,21 @@ public class UploadServiceApplication {
     allEndpoints.addAll(controllerEndpointsSupplier.getEndpoints());
     String basePath = webEndpointProperties.getBasePath();
     EndpointMapping endpointMapping = new EndpointMapping(basePath);
-    boolean shouldRegisterLinksMapping = this.shouldRegisterLinksMapping(webEndpointProperties, environment, basePath);
-    return new WebMvcEndpointHandlerMapping(endpointMapping, webEndpoints, endpointMediaTypes, corsProperties.toCorsConfiguration(), new EndpointLinksResolver(allEndpoints, basePath), shouldRegisterLinksMapping, null);
+    boolean shouldRegisterLinksMapping =
+        this.shouldRegisterLinksMapping(webEndpointProperties, environment, basePath);
+    return new WebMvcEndpointHandlerMapping(
+        endpointMapping,
+        webEndpoints,
+        endpointMediaTypes,
+        corsProperties.toCorsConfiguration(),
+        new EndpointLinksResolver(allEndpoints, basePath),
+        shouldRegisterLinksMapping);
   }
 
-  private boolean shouldRegisterLinksMapping(WebEndpointProperties webEndpointProperties, Environment environment, String basePath) {
-    return webEndpointProperties.getDiscovery().isEnabled() && (StringUtils.hasText(basePath) || ManagementPortType.get(environment).equals(ManagementPortType.DIFFERENT));
+  private boolean shouldRegisterLinksMapping(
+      WebEndpointProperties webEndpointProperties, Environment environment, String basePath) {
+    return webEndpointProperties.getDiscovery().isEnabled()
+        && (StringUtils.hasText(basePath)
+            || ManagementPortType.get(environment).equals(ManagementPortType.DIFFERENT));
   }
 }

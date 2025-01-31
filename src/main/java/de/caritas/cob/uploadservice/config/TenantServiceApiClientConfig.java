@@ -17,8 +17,7 @@ public class TenantServiceApiClientConfig {
   private String tenantServiceApiUrl;
 
   @Bean
-  public TenantControllerApi tenantControllerApi(
-      ApiClient apiClient) {
+  public TenantControllerApi tenantControllerApi(ApiClient apiClient) {
     return new TenantControllerApi(apiClient);
   }
 

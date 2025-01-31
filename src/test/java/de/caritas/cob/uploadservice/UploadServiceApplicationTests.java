@@ -1,13 +1,13 @@
 package de.caritas.cob.uploadservice;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class UploadServiceApplicationTests {
 
   @MockBean UploadServiceApplication uploadServiceApplication;
@@ -16,4 +16,7 @@ public class UploadServiceApplicationTests {
   public void getAuthenticatedUser_Should_ReturnNullWhenNoUserSessionActive() {
     assertNull(uploadServiceApplication.getAuthenticatedUser());
   }
+
+  @Test
+  void name() {}
 }

@@ -1,13 +1,12 @@
 package de.caritas.cob.uploadservice.filter;
 
-
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import com.google.common.net.InternetDomainName;
 import de.caritas.cob.uploadservice.api.service.helper.HttpUrlUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -35,4 +34,3 @@ public class SubdomainExtractor {
     return of(domain.parts().get(0));
   }
 }
-
