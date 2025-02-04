@@ -19,7 +19,7 @@
     <version>3.0.13</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
-
+x`
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -31,7 +31,7 @@
     <log4j.version>2.16.0</log4j.version>
     <openapi.generator.maven.version>6.2.1</openapi.generator.maven.version>
     <liquibase-maven-plugin.version>4.19.0</liquibase-maven-plugin.version>
-    <spring.security.version>6.4.2</spring.security.version>
+    <spring.security.version>6.2.8</spring.security.version>
     <liquibase-core.version>4.9.1</liquibase-core.version>
   </properties>
   <dependencyManagement>
@@ -45,6 +45,13 @@
         <groupId>net.sf.ehcache</groupId>
         <artifactId>ehcache</artifactId>
         <version>2.10.9.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-bom</artifactId>
+        <version>${spring.security.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -70,13 +77,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-bom</artifactId>
-      <version>${spring.security.version}</version>
-      <scope>provided</scope>
-      <type>pom</type>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
