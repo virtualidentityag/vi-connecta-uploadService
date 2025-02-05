@@ -1,23 +1,20 @@
 package de.caritas.cob.uploadservice.config;
 
-import de.caritas.cob.uploadservice.api.authorization.RoleAuthorizationAuthorityMapper;
 import de.caritas.cob.uploadservice.filter.HttpTenantFilter;
 import de.caritas.cob.uploadservice.filter.StatelessCsrfFilter;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
-import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
-import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticatedActionsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
@@ -88,7 +85,7 @@ public class SecurityConfig implements WebMvcConfigurer {
             CsrfFilter.class);
 
     if (multitenancy && httpTenantFilter != null) {
-      http.addFilterAfter(httpTenantFilter, KeycloakAuthenticatedActionsFilter.class);
+      http.addFilterAfter(httpTenantFilter, BearerTokenAuthenticationFilter.class);
     }
 
     http.sessionManagement(
@@ -126,15 +123,5 @@ public class SecurityConfig implements WebMvcConfigurer {
   @Bean
   protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
     return new NullAuthenticatedSessionStrategy();
-  }
-
-  /** Register Keycloak's AuthenticationProvider with a custom GrantedAuthoritiesMapper. */
-  @Autowired
-  public void configureGlobal(
-      AuthenticationManagerBuilder auth, RoleAuthorizationAuthorityMapper authorityMapper) {
-    KeycloakAuthenticationProvider keycloakProvider = new KeycloakAuthenticationProvider();
-    keycloakProvider.setGrantedAuthoritiesMapper(authorityMapper);
-
-    auth.authenticationProvider(keycloakProvider);
   }
 }
