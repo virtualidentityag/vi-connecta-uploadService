@@ -3,12 +3,10 @@ package de.caritas.cob.uploadservice.config;
 import de.caritas.cob.uploadservice.filter.HttpTenantFilter;
 import de.caritas.cob.uploadservice.filter.StatelessCsrfFilter;
 import lombok.RequiredArgsConstructor;
-import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -62,16 +60,6 @@ public class SecurityConfig implements WebMvcConfigurer {
     "/actuator/health",
     "/actuator/health/**"
   };
-
-  /**
-   * Tells Keycloak to use Spring Boot properties (application.yml/application.properties) rather
-   * than a keycloak.json.
-   */
-  @Bean
-  @Primary
-  public KeycloakSpringBootConfigResolver keycloakSpringBootConfigResolver() {
-    return new KeycloakSpringBootConfigResolver();
-  }
 
   @Autowired AuthorisationService authorisationService;
 
