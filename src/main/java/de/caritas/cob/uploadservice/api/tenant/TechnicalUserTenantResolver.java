@@ -34,13 +34,15 @@ public class TechnicalUserTenantResolver implements TenantResolver {
   }
 
   private boolean containsAnyRole(HttpServletRequest request, String... expectedRoles) {
-    JwtAuthenticationToken token = ((JwtAuthenticationToken) request.getUserPrincipal());
-    var roles = extractRealmRoles(token.getToken());
-    if (!roles.isEmpty()) {
-      return containsAny(roles, expectedRoles);
-    } else {
+    if (request.getUserPrincipal() == null) {
       return false;
     }
+    JwtAuthenticationToken token = (JwtAuthenticationToken) request.getUserPrincipal();
+    if (token.getToken() == null) {
+      return false;
+    }
+    var roles = extractRealmRoles(token.getToken());
+    return !roles.isEmpty() && containsAny(roles, expectedRoles);
   }
 
   private boolean containsAny(Collection<String> roles, String... expectedRoles) {
