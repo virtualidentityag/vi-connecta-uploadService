@@ -1,5 +1,11 @@
 package de.caritas.cob.uploadservice.config;
 
+import static de.caritas.cob.uploadservice.api.authorization.Authority.AuthorityValue.ANONYMOUS_DEFAULT;
+import static de.caritas.cob.uploadservice.api.authorization.Authority.AuthorityValue.CONSULTANT_DEFAULT;
+import static de.caritas.cob.uploadservice.api.authorization.Authority.AuthorityValue.TECHNICAL_DEFAULT;
+import static de.caritas.cob.uploadservice.api.authorization.Authority.AuthorityValue.USER_DEFAULT;
+import static de.caritas.cob.uploadservice.api.authorization.Authority.AuthorityValue.USE_FEEDBACK;
+
 import de.caritas.cob.uploadservice.filter.HttpTenantFilter;
 import de.caritas.cob.uploadservice.filter.StatelessCsrfFilter;
 import lombok.RequiredArgsConstructor;
@@ -38,13 +44,6 @@ public class SecurityConfig implements WebMvcConfigurer {
 
   @Value("${multitenancy.enabled}")
   private boolean multitenancy;
-
-  // Custom role/authority constants
-  private static final String TECHNICAL_DEFAULT = "ROLE_TECHNICAL_DEFAULT";
-  private static final String USER_DEFAULT = "ROLE_USER_DEFAULT";
-  private static final String CONSULTANT_DEFAULT = "ROLE_CONSULTANT_DEFAULT";
-  private static final String ANONYMOUS_DEFAULT = "ROLE_ANONYMOUS_DEFAULT";
-  private static final String USE_FEEDBACK = "ROLE_USE_FEEDBACK";
 
   // Whitelist for Swagger, Actuator endpoints, etc.
   public static final String[] WHITE_LIST = {
