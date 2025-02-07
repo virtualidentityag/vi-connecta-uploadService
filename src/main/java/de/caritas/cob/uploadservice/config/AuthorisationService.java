@@ -2,14 +2,12 @@ package de.caritas.cob.uploadservice.config;
 
 import com.google.common.collect.Lists;
 import de.caritas.cob.uploadservice.api.authorization.RoleAuthorizationAuthorityMapper;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -34,12 +32,8 @@ public class AuthorisationService {
 
   public Collection<GrantedAuthority> extractRealmAuthorities(Jwt jwt) {
     var roles = extractRealmRoles(jwt);
-    Collection<? extends GrantedAuthority> tempAuthorities =
-        roles.stream()
-            .map(SimpleGrantedAuthority::new)
-            .collect(Collectors.toSet()); // Set or List, as needed
-
-    return new ArrayList<>(tempAuthorities);
+    return roleAuthorizationAuthorityMapper.mapAuthorities(
+        roles.stream().collect(Collectors.toSet()));
   }
 
   public Collection<String> extractRealmRoles(Jwt jwt) {
