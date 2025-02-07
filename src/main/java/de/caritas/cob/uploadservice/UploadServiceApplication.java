@@ -1,7 +1,6 @@
 package de.caritas.cob.uploadservice;
 
-import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
-
+import com.google.common.collect.Lists;
 import de.caritas.cob.uploadservice.api.exception.KeycloakException;
 import de.caritas.cob.uploadservice.api.helper.AuthenticatedUser;
 import de.caritas.cob.uploadservice.media.MimeTypeDetector;
@@ -11,13 +10,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import org.apache.tika.Tika;
-import org.keycloak.KeycloakSecurityContext;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties;
@@ -40,8 +35,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -76,87 +71,43 @@ public class UploadServiceApplication {
   }
 
   /**
-   * Returns the @KeycloakAuthenticationToken which represents the token for a Keycloak
-   * authentication.
-   *
-   * @return KeycloakAuthenticationToken
-   */
-  @Bean
-  @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
-  public KeycloakAuthenticationToken getAccessToken() {
-    return (KeycloakAuthenticationToken) getRequest().getUserPrincipal();
-  }
-
-  /**
-   * Returns the @KeycloakSecurityContext.
-   *
-   * @return KeycloakSecurityContext
-   */
-  @Bean
-  @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
-  public KeycloakSecurityContext getKeycloakSecurityContext() {
-    return ((KeycloakAuthenticationToken) getRequest().getUserPrincipal())
-        .getAccount()
-        .getKeycloakSecurityContext();
-  }
-
-  /**
-   * Returns the Keycloak user id of the authenticated user.
+   * Returns the currently authenticated user.
    *
    * @return {@link AuthenticatedUser}
    */
   @Bean
   @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
-  public AuthenticatedUser getAuthenticatedUser() {
+  AuthenticatedUser getAuthenticatedUser() {
 
-    // Get current KeycloakSecurityContext
-    KeycloakSecurityContext keycloakSecContext =
-        ((KeycloakAuthenticationToken) getRequest().getUserPrincipal())
-            .getAccount()
-            .getKeycloakSecurityContext();
+    JwtAuthenticationToken authenticationToken =
+        (JwtAuthenticationToken) getRequest().getUserPrincipal();
 
-    Map<String, Object> claimMap = keycloakSecContext.getToken().getOtherClaims();
-
+    Map<String, Object> claimMap = authenticationToken.getToken().getClaims();
     AuthenticatedUser authenticatedUser = new AuthenticatedUser();
-
-    if (claimMap.containsKey(CLAIM_NAME_USER_ID)) {
-      authenticatedUser.setUserId(claimMap.get(CLAIM_NAME_USER_ID).toString());
-    } else {
-      throw new KeycloakException(
-          "Keycloak user attribute '" + CLAIM_NAME_USER_ID + "' not found.");
-    }
-
-    if (claimMap.containsKey(CLAIM_NAME_USERNAME)) {
-      authenticatedUser.setUsername(claimMap.get(CLAIM_NAME_USERNAME).toString());
-    }
-
-    // Set user roles
-    AccessToken.Access realmAccess =
-        ((KeycloakAuthenticationToken) getRequest().getUserPrincipal())
-            .getAccount()
-            .getKeycloakSecurityContext()
-            .getToken()
-            .getRealmAccess();
-    Set<String> roles = realmAccess.getRoles();
-    if (isNotEmpty(roles)) {
-      authenticatedUser.setRoles(roles);
-    } else {
-      throw new KeycloakException(authenticatedUser.getUserId());
-    }
-
-    // Set granted authorities
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    authenticatedUser.setGrantedAuthorities(
-        authentication.getAuthorities().stream().map(Object::toString).collect(Collectors.toSet()));
-
-    // Set Keycloak token to authenticated user object
-    if (keycloakSecContext.getTokenString() != null) {
-      authenticatedUser.setAccessToken(keycloakSecContext.getTokenString());
-    } else {
-      throw new KeycloakException("No valid Keycloak access token string found.");
-    }
-
+    authenticatedUser.setAccessToken(authenticationToken.getToken().getTokenValue());
+    authenticatedUser.setUserId(getUserAttribute(claimMap, CLAIM_NAME_USER_ID));
+    authenticatedUser.setUsername(getUserAttribute(claimMap, CLAIM_NAME_USERNAME));
+    authenticatedUser.setRoles(
+        extractRealmRoles(authenticationToken.getToken()).stream().collect(Collectors.toSet()));
     return authenticatedUser;
+  }
+
+  public Collection<String> extractRealmRoles(Jwt jwt) {
+    Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
+    if (realmAccess != null) {
+      var roles = (List<String>) realmAccess.get("roles");
+      if (roles != null) {
+        return roles;
+      }
+    }
+    return Lists.newArrayList();
+  }
+
+  private String getUserAttribute(Map<String, Object> claimMap, String claimValue) {
+    if (!claimMap.containsKey(claimValue)) {
+      throw new KeycloakException("Keycloak user attribute '" + claimValue + "' not found.");
+    }
+    return claimMap.get(claimValue).toString();
   }
 
   private HttpServletRequest getRequest() {

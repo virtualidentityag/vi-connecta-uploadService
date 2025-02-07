@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
@@ -74,6 +73,10 @@ public class SecurityConfig implements WebMvcConfigurer {
     return new KeycloakSpringBootConfigResolver();
   }
 
+  @Autowired AuthorisationService authorisationService;
+
+  @Autowired JwtAuthConverterProperties jwtAuthConverterProperties;
+
   /** Defines our SecurityFilterChain (the new style in Spring Security 6). */
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -107,16 +110,13 @@ public class SecurityConfig implements WebMvcConfigurer {
                     .anyRequest()
                     .denyAll())
         .oauth2ResourceServer(
-            oauth2 ->
-                oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
-    ;
-
+            oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter())));
     return http.build();
   }
 
   @Bean
-  public JwtAuthenticationConverter jwtAuthenticationConverter() {
-    return new JwtAuthenticationConverter();
+  public JwtAuthConverter jwtAuthConverter() {
+    return new JwtAuthConverter(jwtAuthConverterProperties, authorisationService);
   }
 
   /** Use a NullAuthenticatedSessionStrategy for stateless sessions. */

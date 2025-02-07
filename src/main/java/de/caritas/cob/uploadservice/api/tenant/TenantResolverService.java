@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -103,6 +105,10 @@ public class TenantResolverService {
   }
 
   private boolean userIsAuthenticated(HttpServletRequest request) {
-    return request.getUserPrincipal() != null;
+    /* after upgrade to oauth2ResourceServer security configuration (spring 6.x upgrade)
+    for authenticated users request.getUserPrincipal() might be still null at the time of HttpTenantFilter is executed
+    but BearerTokenAuthenticationFilter has already set the principal in the SecurityContext */
+    SecurityContext context = SecurityContextHolder.getContext();
+    return context.getAuthentication() != null && context.getAuthentication().isAuthenticated();
   }
 }

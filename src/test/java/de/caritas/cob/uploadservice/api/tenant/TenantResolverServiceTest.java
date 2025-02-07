@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -14,6 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @ExtendWith(MockitoExtension.class)
 class TenantResolverServiceTest {
@@ -37,6 +41,15 @@ class TenantResolverServiceTest {
 
   @Mock private TechnicalUserTenantResolver technicalUserTenantResolver;
 
+  @Mock private SecurityContext mockSecurityContext;
+
+  @Mock private Authentication mockAuthentication;
+
+  @AfterEach
+  void tearDown() {
+    SecurityContextHolder.clearContext();
+  }
+
   @Test
   void resolve_Should_ResolveFromAccessTokenForAuthenticatedUser_And_PassValidation() {
     // given
@@ -54,7 +67,9 @@ class TenantResolverServiceTest {
   }
 
   private void givenUserIsAuthenticated() {
-    when(authenticatedRequest.getUserPrincipal()).thenReturn(token);
+    SecurityContextHolder.setContext(mockSecurityContext);
+    when(mockSecurityContext.getAuthentication()).thenReturn(mockAuthentication);
+    when(mockAuthentication.isAuthenticated()).thenReturn(true);
   }
 
   @Test
