@@ -27,10 +27,11 @@
     <keycloak.version>17.0.0</keycloak.version>
     <!-- force at least version 2.16 due to https://logging.apache.org/log4j/2.x/security.html -->
     <log4j.version>2.16.0</log4j.version>
-    <openapi.generator.maven.version>6.2.1</openapi.generator.maven.version>
+    <openapi.generator.maven.version>7.11.0</openapi.generator.maven.version>
     <liquibase-maven-plugin.version>4.19.0</liquibase-maven-plugin.version>
     <spring.security.version>6.2.8</spring.security.version>
     <liquibase-core.version>4.9.1</liquibase-core.version>
+    <jakarta.ws.rs-api.version>4.0.0</jakarta.ws.rs-api.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -116,7 +117,7 @@
     <dependency>
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
-      <version>4.0.0</version>
+      <version>${jakarta.ws.rs-api.version}</version>
     </dependency>
 
     <dependency>
@@ -352,25 +353,6 @@
     </resources>
     <plugins>
       <plugin>
-        <groupId>org.openrewrite.maven</groupId>
-        <artifactId>rewrite-maven-plugin</artifactId>
-        <version>6.0.4</version>
-        <configuration>
-          <exportDatatables>true</exportDatatables>
-          <activeRecipes>
-            <recipe>org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_3</recipe>
-          </activeRecipes>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.openrewrite.recipe</groupId>
-            <artifactId>rewrite-spring</artifactId>
-            <version>6.0.2</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-
-      <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
@@ -468,7 +450,8 @@
               <generateApis>true</generateApis>
               <generateApiTests>false</generateApiTests>
               <generateModelTests>false</generateModelTests>
-              <apiPackage>${project.groupId}.${project.artifactId}.tenantservice.generated.web
+              <apiPackage>
+                ${project.groupId}.${project.artifactId}.tenantservice.generated.web
               </apiPackage>
               <modelPackage>
                 ${project.groupId}.${project.artifactId}.tenantservice.generated.web.model
