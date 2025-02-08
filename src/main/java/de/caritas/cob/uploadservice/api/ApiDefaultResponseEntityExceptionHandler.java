@@ -1,8 +1,13 @@
 package de.caritas.cob.uploadservice.api;
 
+import de.caritas.cob.uploadservice.api.service.LogService;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 
 @ControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE)
@@ -17,4 +22,11 @@ public class ApiDefaultResponseEntityExceptionHandler {
    * @param request WebRequest
    * @return
    */
+  @ExceptionHandler({Exception.class})
+  public ResponseEntity<Object> handleInternal(
+      final RuntimeException ex, final WebRequest request) {
+    LogService.logInternalServerError(ex);
+
+    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
 }

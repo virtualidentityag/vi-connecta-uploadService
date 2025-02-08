@@ -47,7 +47,8 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
       HttpStatusCode status,
       WebRequest request) {
     LogService.logWarning(ex);
-    return this.handleExceptionInternal(ex, (Object) null, headers, status, request);
+    return handleExceptionInternal(
+        ex, null, new HttpHeaders(), HttpStatus.PAYLOAD_TOO_LARGE, request);
   }
 
   /**
