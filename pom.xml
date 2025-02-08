@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.0.13</version>
+    <version>3.1.12</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
@@ -43,6 +43,11 @@
         <groupId>net.sf.ehcache</groupId>
         <artifactId>ehcache</artifactId>
         <version>2.10.9.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-inline</artifactId>
+        <version>5.2.0</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
@@ -111,13 +116,12 @@
     <dependency>
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
-      <version>3.1.0</version>
+      <version>4.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents.client5</groupId>
       <artifactId>httpclient5</artifactId>
-      <version>5.2</version>
     </dependency>
 
     <!-- Swagger/OpenApi dependencies -->
@@ -180,7 +184,7 @@
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-      <version>2.1.0</version>
+      <version>2.2.0</version>
     </dependency>
 
     <!-- Apache Commons Lang -->
@@ -278,13 +282,13 @@
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-inline</artifactId>
+      <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
-      <version>5.12.0</version>
+      <version>5.15.2</version>
       <scope>test</scope>
     </dependency>
     <!--    <dependency>-->
@@ -353,10 +357,8 @@
         <version>6.0.4</version>
         <configuration>
           <exportDatatables>true</exportDatatables>
-          <!--          <configLocation>.rewrite/recipe.yml</configLocation>-->
           <activeRecipes>
-            <recipe>org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_0</recipe>
-            <recipe>org.openrewrite.java.springdoc.SpringFoxToSpringDoc</recipe>
+            <recipe>org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_1</recipe>
           </activeRecipes>
         </configuration>
         <dependencies>
