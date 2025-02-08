@@ -6,7 +6,6 @@ on:
       - 'release'
       - 'staging'
       - 'develop'
-      - "tsys-release"
     tags:
       - "dockerImage.v.*"
       - "v*"
@@ -28,10 +27,9 @@ jobs:
       - name: Setup JVM
         uses: actions/setup-java@v1
         with:
-          java-version: 11.0.10
+          java-version: 17
           java-package: jdk
           architecture: x64
-
       - name: Caching maven dependencies
         uses: actions/cache@v4
         env:
@@ -183,6 +181,7 @@ jobs:
           custom-actions: |
             - text: View CI
               url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
       - name: Publish to T-sys if T-sys release
         if: ${{ (github.ref == 'refs/heads/tsys-release') && (matrix.registry == 'ghcr.io') }}
         uses: fjogeleit/http-request-action@v1
