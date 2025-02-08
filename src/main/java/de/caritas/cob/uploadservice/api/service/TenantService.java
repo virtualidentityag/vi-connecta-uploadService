@@ -21,26 +21,11 @@ public class TenantService {
     return getRestrictedTenantDTO(subdomain);
   }
 
-  public RestrictedTenantDTO getRestrictedTenantDataBySubdomainNonCached(String subdomain) {
-    return getRestrictedTenantDTO(subdomain);
-  }
-
   private RestrictedTenantDTO getRestrictedTenantDTO(String subdomain) {
     log.debug("Calling tenant service to get tenant data for subdomain {}", subdomain);
     return tenantServiceApiControllerFactory
         .createControllerApi()
-        .getRestrictedTenantDataBySubdomainWithHttpInfo(subdomain, null)
+        .getRestrictedTenantDataBySubdomainWithHttpInfo(subdomain)
         .getBody();
-  }
-
-  private RestrictedTenantDTO getRestrictedTenantDTO(Long tenantId) {
-    log.debug("Calling tenant service to get tenant data for tenantId {}", tenantId);
-    return tenantServiceApiControllerFactory
-        .createControllerApi()
-        .getRestrictedTenantDataByTenantId(tenantId);
-  }
-
-  public RestrictedTenantDTO getRestrictedTenantDataNonCached(Long tenantId) {
-    return getRestrictedTenantDTO(tenantId);
   }
 }
