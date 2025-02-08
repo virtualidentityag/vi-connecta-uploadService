@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -38,20 +39,15 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-  /**
-   * Handles {@link MaxUploadSizeExceededException}.
-   *
-   * @param ex MaxUploadSizeExceededException
-   * @param request WebRequest
-   * @return a {@link ResponseEntity} instance
-   */
-  @ExceptionHandler({MaxUploadSizeExceededException.class})
-  public ResponseEntity<Object> handleCustomBadRequest(
-      final MaxUploadSizeExceededException ex, final WebRequest request) {
+  @Nullable
+  @Override
+  protected ResponseEntity<Object> handleMaxUploadSizeExceededException(
+      MaxUploadSizeExceededException ex,
+      HttpHeaders headers,
+      HttpStatusCode status,
+      WebRequest request) {
     LogService.logWarning(ex);
-
-    return handleExceptionInternal(
-        ex, null, new HttpHeaders(), HttpStatus.PAYLOAD_TOO_LARGE, request);
+    return this.handleExceptionInternal(ex, (Object) null, headers, status, request);
   }
 
   /**
