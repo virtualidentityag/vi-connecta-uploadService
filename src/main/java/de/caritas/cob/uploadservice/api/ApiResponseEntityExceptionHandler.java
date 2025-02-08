@@ -27,7 +27,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
-import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
@@ -69,21 +68,6 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
 
     return handleExceptionInternal(
         ex, null, new HttpHeaders(), HttpStatus.UNSUPPORTED_MEDIA_TYPE, request);
-  }
-
-  /**
-   * Handles {@link MultipartException}.
-   *
-   * @param ex MultipartException
-   * @param request WebRequest
-   * @return a {@link ResponseEntity} instance
-   */
-  @ExceptionHandler({MultipartException.class})
-  public ResponseEntity<Object> handleCustomBadRequest(
-      final MultipartException ex, final WebRequest request) {
-    LogService.logWarning(ex);
-
-    return handleExceptionInternal(ex, null, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
   }
 
   /**

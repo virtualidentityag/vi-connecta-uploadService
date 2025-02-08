@@ -18,10 +18,10 @@ public class TenantService {
 
   @Cacheable(cacheNames = CacheManagerConfig.TENANT_CACHE, key = "#subdomain")
   public RestrictedTenantDTO getRestrictedTenantDataBySubdomain(String subdomain) {
-    return getRestrictedTenantDTO(subdomain);
+    return getRestrictedTenantDto(subdomain);
   }
 
-  private RestrictedTenantDTO getRestrictedTenantDTO(String subdomain) {
+  private RestrictedTenantDTO getRestrictedTenantDto(String subdomain) {
     log.debug("Calling tenant service to get tenant data for subdomain {}", subdomain);
     return tenantServiceApiControllerFactory
         .createControllerApi()
