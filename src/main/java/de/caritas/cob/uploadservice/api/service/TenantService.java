@@ -1,6 +1,5 @@
 package de.caritas.cob.uploadservice.api.service;
 
-import de.caritas.cob.uploadservice.config.CacheManagerConfig;
 import de.caritas.cob.uploadservice.config.TenantServiceApiControllerFactory;
 import de.caritas.cob.uploadservice.tenantservice.generated.web.model.RestrictedTenantDTO;
 import lombok.NonNull;
@@ -16,7 +15,7 @@ public class TenantService {
 
   private final @NonNull TenantServiceApiControllerFactory tenantServiceApiControllerFactory;
 
-  @Cacheable(cacheNames = CacheManagerConfig.TENANT_CACHE, key = "#subdomain")
+  @Cacheable("tenantCache")
   public RestrictedTenantDTO getRestrictedTenantDataBySubdomain(String subdomain) {
     return getRestrictedTenantDto(subdomain);
   }
