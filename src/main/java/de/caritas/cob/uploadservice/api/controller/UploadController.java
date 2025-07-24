@@ -72,8 +72,8 @@ public class UploadController implements UploadsApi {
       @RequestHeader String rcUserId,
       @RequestPart MultipartFile file,
       @RequestParam String sendNotification,
-      @RequestPart(required = false) String t,
-      @RequestPart(required = false) String fileHeader,
+      @RequestParam(required = false) String t,
+      @RequestParam(required = false) String fileHeader,
       @RequestParam(required = false) String msg,
       @RequestParam(required = false) String description,
       @RequestParam(required = false) String tmId) {
